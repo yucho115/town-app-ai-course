@@ -6,6 +6,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 from pathlib import Path
+from typing import List, Literal
+from pydantic import BaseModel
 import os
 
 # パスの設定
@@ -44,6 +46,13 @@ app.add_middleware(
 # フロントエンドの静的ファイルをマウント
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
+class ChatMessage(BaseModel):
+    role: Literal["system", "user", "assistant"]
+    content: str
+
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage]
+
 # ルートで index.html を返す
 @app.get("/")
 async def root():
@@ -55,12 +64,12 @@ class Message(BaseModel):
 
 # チャットAPIのエンドポイント
 @app.post("/chat")
-async def chat(message: Message):
-    print(f"Received prompt: {message.prompt}")
+async def chat(request: ChatRequest):
     try:
+        print(f"Received messages: {request.messages}")
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
-            messages=[{"role": "user", "content": message.prompt}],
+            messages=[m.dict() for m in request.messages],
             temperature=0.7,
             max_tokens=1000,
         )

@@ -1,0 +1,23 @@
+.message {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-break: break-word;
+    display: inline-block;
+  }
+  
+  .message.user {
+    align-self: flex-end;
+    background-color: #9fe2bf;
+    border-bottom-right-radius: 0;
+  }
+  
+  .message.bot {
+    align-self: flex-start;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-bottom-left-radius: 0;
+  }
+  

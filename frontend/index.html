@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>チャットボット</title>
+
+  <link rel="stylesheet" href="/static/styles/base.css" />
+  <link rel="stylesheet" href="/static/styles/layout.css" />
+  <link rel="stylesheet" href="/static/styles/message.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <header>
+      <h1>Azure OpenAI チャットボット</h1>
+    </header>
+
+    <main id="chat-box"></main>
+
+    <div class="input-area">
+      <input type="text" id="prompt" placeholder="メッセージを入力..." />
+      <button onclick="sendMessage()">送信</button>
+    </div>
+  </div>
+
+  <script src="/static/scripts/chat.js"></script>
+</body>
+</html>

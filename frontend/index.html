@@ -3,26 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>チャットボット</title>
-
-  <link rel="stylesheet" href="/static/styles/base.css" />
-  <link rel="stylesheet" href="/static/styles/layout.css" />
-  <link rel="stylesheet" href="/static/styles/message.css" />
+  <title>AIチャットボット（雛形）</title>
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/message.css" />
 </head>
 <body>
   <div class="chat-container">
-    <header>
-      <h1>Azure OpenAI チャットボット</h1>
-    </header>
-
-    <main id="chat-box"></main>
-
-    <div class="input-area">
-      <input type="text" id="prompt" placeholder="メッセージを入力..." />
-      <button onclick="sendMessage()">送信</button>
+    <div id="chat-messages" class="chat-messages">
+      <!-- チャット履歴がここに追加される -->
     </div>
+    <form id="chat-form" class="chat-form">
+      <input
+        type="text"
+        id="user-input"
+        placeholder="メッセージを入力してください"
+        autocomplete="off"
+      />
+      <button type="submit">送信</button>
+    </form>
   </div>
 
-  <script src="/static/scripts/chat.js"></script>
+  <script src="script/chat.js"></script>
 </body>
 </html>

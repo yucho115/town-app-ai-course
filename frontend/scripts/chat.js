@@ -1,47 +1,21 @@
-let messages = [
-  { role: "system", content: "あなたは親切なAIアシスタントです。" }
-];
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("user-input");
+  const messages = document.getElementById("chat-messages");
 
-async function sendMessage() {
-  const input = document.getElementById("prompt");
-  const message = input.value.trim();
-  if (!message) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-  const chatBox = document.getElementById("chat-box");
+    const userMessage = input.value.trim();
+    if (userMessage === "") return;
 
-  // ユーザーのメッセージを表示＆履歴に追加
-  const userMsg = document.createElement("div");
-  userMsg.className = "message user";
-  userMsg.textContent = message;
-  chatBox.appendChild(userMsg);
+    const userMessageElem = document.createElement("div");
+    userMessageElem.className = "message user";
+    userMessageElem.textContent = userMessage;
+    messages.appendChild(userMessageElem);
 
-  messages.push({ role: "user", content: message });
-  input.value = "";
+    input.value = "";
 
-  // 考え中メッセージを追加
-  const botMsg = document.createElement("div");
-  botMsg.className = "message bot";
-  botMsg.textContent = "考え中...";
-  chatBox.appendChild(botMsg);
-  chatBox.scrollTop = chatBox.scrollHeight;
 
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages }), // 履歴をすべて送信
-    });
-
-    const data = await res.json();
-    botMsg.textContent = data.response;
-    messages.push({ role: "assistant", content: data.response }); // AIの応答を履歴に追加
-  } catch (err) {
-    botMsg.textContent = "エラーが発生しました。";
-  }
-
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-document.getElementById("prompt").addEventListener("keypress", function (e) {
-  if (e.key === "Enter") sendMessage();
+  });
 });

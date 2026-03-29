@@ -23,7 +23,7 @@ def serve_index():
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
-    user_message = data.get("message", "")
+    messages = data.get("messages", [])
     
     # Sakura AI APIを呼び出し
     url = "https://api.ai.sakura.ad.jp/v1/chat/completions"
@@ -33,7 +33,7 @@ async def chat(request: Request):
     }
     payload = {
         "model": "gpt-oss-120b",
-        "messages": [{"role": "user", "content": user_message}]
+        "messages": messages
     }
     
     try:

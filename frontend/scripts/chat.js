@@ -8,7 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  function appendMessage(text, sender) {
+  let chatHistory = [];
+
+  function appendMessage(text, sender, addToHistory = true) {
     const row = document.createElement("div");
     row.classList.add("message-row", sender);
 
@@ -20,6 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
     messages.appendChild(row);
 
     messages.scrollTop = messages.scrollHeight;
+
+    // 履歴に追加
+    if (addToHistory) {
+      const role = sender === "user" ? "user" : "assistant";
+      chatHistory.push({ role: role, content: text });
+    }
+
     return bubble;
   }
 
@@ -37,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (userMessage === "") return;
 
     appendMessage(userMessage, "user");
-    const thinkingBubble = appendMessage("考え中...", "bot");
+    const thinkingBubble = appendMessage("考え中...", "bot", false);
 
     input.value = "";
 
@@ -47,13 +56,17 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ messages: chatHistory })
       });
 
       const data = await response.json();
       thinkingBubble.textContent = data.response ?? "応答を取得できませんでした";
+      // 履歴にAIの応答を追加
+      chatHistory.push({ role: "assistant", content: thinkingBubble.textContent });
     } catch (error) {
       thinkingBubble.textContent = "エラー: " + error.message;
+      // エラーの場合も履歴に追加
+      chatHistory.push({ role: "assistant", content: thinkingBubble.textContent });
     }
 
     messages.scrollTop = messages.scrollHeight;

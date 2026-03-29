@@ -3,53 +3,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("user-input");
   const messages = document.getElementById("chat-messages");
 
-  // Enterキーで送信
+  if (!form || !input || !messages) {
+    console.error("必要な要素が見つかりません");
+    return;
+  }
+
+  function appendMessage(text, sender) {
+    const row = document.createElement("div");
+    row.classList.add("message-row", sender);
+
+    const bubble = document.createElement("div");
+    bubble.classList.add("message", sender);
+    bubble.textContent = text;
+
+    row.appendChild(bubble);
+    messages.appendChild(row);
+
+    messages.scrollTop = messages.scrollHeight;
+    return bubble;
+  }
+
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      form.dispatchEvent(new Event("submit"));
+      form.requestSubmit();
     }
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const userMessage = input.value.trim();
     if (userMessage === "") return;
 
-    // ユーザーメッセージを表示
-    const userMessageElem = document.createElement("div");
-    userMessageElem.className = "message user";
-    userMessageElem.textContent = userMessage;
-    messages.appendChild(userMessageElem);
-
-    // 考え中メッセージを表示
-    const thinkingMessage = document.createElement("div");
-    thinkingMessage.className = "message bot";
-    thinkingMessage.textContent = "考え中...";
-    messages.appendChild(thinkingMessage);
+    appendMessage(userMessage, "user");
+    const thinkingBubble = appendMessage("考え中...", "bot");
 
     input.value = "";
 
-    // サーバーにメッセージを送信
-    fetch("/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: userMessage })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // 考え中をAI応答に置き換え
-      thinkingMessage.textContent = data.response;
-    })
-    .catch(error => {
-      // エラー時はエラーメッセージを表示
-      thinkingMessage.textContent = "エラー: " + error.message;
-    });
+    try {
+      const response = await fetch("/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: userMessage })
+      });
 
-    // スクロールを下に
+      const data = await response.json();
+      thinkingBubble.textContent = data.response ?? "応答を取得できませんでした";
+    } catch (error) {
+      thinkingBubble.textContent = "エラー: " + error.message;
+    }
+
     messages.scrollTop = messages.scrollHeight;
   });
 });

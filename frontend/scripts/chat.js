@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  let chatHistory = [];
+  const chatHistory = [];
 
   function appendMessage(text, sender, addToHistory = true) {
     const row = document.createElement("div");
@@ -20,13 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     row.appendChild(bubble);
     messages.appendChild(row);
-
     messages.scrollTop = messages.scrollHeight;
 
-    // 履歴に追加
     if (addToHistory) {
       const role = sender === "user" ? "user" : "assistant";
-      chatHistory.push({ role: role, content: text });
+      chatHistory.push({ role, content: text });
     }
 
     return bubble;
@@ -43,12 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const userMessage = input.value.trim();
-    if (userMessage === "") return;
+    if (!userMessage) return;
 
     appendMessage(userMessage, "user");
-    const thinkingBubble = appendMessage("考え中...", "bot", false);
 
+    // 入力欄を空にする
+    form.reset();
     input.value = "";
+    input.focus();
+
+    const thinkingBubble = appendMessage("考え中...", "bot", false);
 
     try {
       const response = await fetch("/chat", {
@@ -60,13 +62,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await response.json();
-      thinkingBubble.textContent = data.response ?? "応答を取得できませんでした";
-      // 履歴にAIの応答を追加
-      chatHistory.push({ role: "assistant", content: thinkingBubble.textContent });
+      const botReply = data.response ?? "応答を取得できませんでした";
+      thinkingBubble.textContent = botReply;
+      chatHistory.push({ role: "assistant", content: botReply });
     } catch (error) {
-      thinkingBubble.textContent = "エラー: " + error.message;
-      // エラーの場合も履歴に追加
-      chatHistory.push({ role: "assistant", content: thinkingBubble.textContent });
+      const errorMessage = "エラー: " + error.message;
+      thinkingBubble.textContent = errorMessage;
+      chatHistory.push({ role: "assistant", content: errorMessage });
     }
 
     messages.scrollTop = messages.scrollHeight;
